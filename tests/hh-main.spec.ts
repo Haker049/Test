@@ -67,14 +67,10 @@ const destinations = [
 ] as const;
 
 for (const [id, label, path, title] of destinations) {
-  test(id + ' — переход из футера: ' + label, async ({ page, context }) => {
-    await new MainPage(page).open();
-    const link = page.locator('footer').getByRole('link', { name: label, exact: true });
-    await link.scrollIntoViewIfNeeded();
-    const target = await link.getAttribute('target');
-    const popup = target === '_blank' ? context.waitForEvent('page') : undefined;
-    await link.click();
-    const destination = popup ? await popup : page;
+  test(id + ' — переход из футера: ' + label, async ({ page }) => {
+    const mainPage = new MainPage(page);
+    await mainPage.open();
+    const destination = await mainPage.openFooterLink(label);
     await expect(destination).toHaveURL(url =>
       url.hostname === 'vladivostok.hh.ru' && url.pathname === path);
     await expect(destination).toHaveTitle(title);

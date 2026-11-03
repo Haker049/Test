@@ -79,6 +79,16 @@ export class MainPage {
     await this.cookieAcceptButton.click({ timeout: 3_000 }).catch(() => {});
   }
 
+  async openFooterLink(label: string): Promise<Page> {
+    const link = this.page.locator('footer').getByRole('link', { name: label, exact: true });
+    if (await link.getAttribute('target') === '_blank') {
+      const [popup] = await Promise.all([this.page.waitForEvent('popup'), link.click()]);
+      return popup;
+    }
+    await link.click();
+    return this.page;
+  }
+
   /** Прокручивает страницу в самый низ (футер может дорисовываться при скролле). */
   async scrollToBottom(): Promise<void> {
     await this.page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
